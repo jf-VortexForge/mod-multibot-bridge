@@ -9735,7 +9735,7 @@ void CompletePendingWarlockStoneSwitch(Player* player, std::string const& key, s
     PendingWarlockStoneSwitch& pending = pendingIt->second;
     ++pending.applyAttempts;
 
-    if (!player || !player->GetSession() || !(player->GetPlayerbotAI() && player->GetPlayerbotAI()->IsRealPlayer()) || player->getClass() != CLASS_WARLOCK)
+    if (!player || !player->GetSession() || !(sPlayerbotsMgr.GetPlayerbotAI(player) && sPlayerbotsMgr.GetPlayerbotAI(player)->IsRealPlayer()) || player->getClass() != CLASS_WARLOCK)
     {
         FinishPendingWarlockStoneSwitch(player, key, token, false, "STONE_STATE_INVALID");
         return;
@@ -10284,7 +10284,7 @@ void RunSelfActionCommand(
 
     if (!requester || !requester->GetSession())
         reason = "NO_SESSION";
-    else if (!(requester->GetPlayerbotAI() && requester->GetPlayerbotAI()->IsRealPlayer()))
+    else if (!(sPlayerbotsMgr.GetPlayerbotAI(requester) && sPlayerbotsMgr.GetPlayerbotAI(requester)->IsRealPlayer()))
         reason = "NOT_SELF_BOT";
     else if (!ConsumeSelfBotRequestRateLimit(requester))
         reason = "RATE_LIMIT";
@@ -10461,7 +10461,7 @@ void RunSelfStrategyMutationCommand(
                 }
                 else if (!ConsumeStrategyMutationRateLimit(requester))
                     reason = "RATE_LIMIT";
-                else if (!(requester->GetPlayerbotAI() && requester->GetPlayerbotAI()->IsRealPlayer()))
+                else if (!(sPlayerbotsMgr.GetPlayerbotAI(requester) && sPlayerbotsMgr.GetPlayerbotAI(requester)->IsRealPlayer()))
                     reason = "NOT_SELF_BOT";
                 else if (!GET_PLAYERBOT_AI(requester))
                     reason = "NO_AI";
@@ -12246,7 +12246,7 @@ void SendSelfStrategyStatePacket(Player* player, ChatMsg replyType, std::string 
         return;
     }
 
-    if (!(player->GetPlayerbotAI() && player->GetPlayerbotAI()->IsRealPlayer()))
+    if (!(sPlayerbotsMgr.GetPlayerbotAI(player) && sPlayerbotsMgr.GetPlayerbotAI(player)->IsRealPlayer()))
     {
         SendStateAbort(player, replyType, token, player->GetName(), "NOT_SELF_BOT");
         return;
@@ -12459,7 +12459,7 @@ void SendSelfBotPacket(
     std::ostringstream out;
     out << requestToken
         << kFieldSeparator << status
-        << kFieldSeparator << ((requester->GetPlayerbotAI() && requester->GetPlayerbotAI()->IsRealPlayer()) ? 1 : 0)
+        << kFieldSeparator << ((sPlayerbotsMgr.GetPlayerbotAI(requester) && sPlayerbotsMgr.GetPlayerbotAI(requester)->IsRealPlayer()) ? 1 : 0)
         << kFieldSeparator << UrlEncodeField(reason);
     SendAddonPacket(requester, replyType, opcode, out.str());
 }
@@ -12478,7 +12478,7 @@ void RunSelfBotCommand(
     else
     {
         bool const desiredActive = desiredState == "ENABLE";
-        bool const currentActive = (requester->GetPlayerbotAI() && requester->GetPlayerbotAI()->IsRealPlayer());
+        bool const currentActive = (sPlayerbotsMgr.GetPlayerbotAI(requester) && sPlayerbotsMgr.GetPlayerbotAI(requester)->IsRealPlayer());
 
         if (currentActive == desiredActive)
         {
@@ -12501,7 +12501,7 @@ void RunSelfBotCommand(
             else
             {
                 mgr->HandlePlayerbotCommand("self", requester);
-                if ((requester->GetPlayerbotAI() && requester->GetPlayerbotAI()->IsRealPlayer()) == desiredActive)
+                if ((sPlayerbotsMgr.GetPlayerbotAI(requester) && sPlayerbotsMgr.GetPlayerbotAI(requester)->IsRealPlayer()) == desiredActive)
                 {
                     status = "OK";
                     reason = "APPLIED";
